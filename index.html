@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Server Status</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url('./share/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #fff;
+            font-family: 'Minecraftia', sans-serif;
+            overflow-x: hidden;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 50px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 2s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        h1 {
+            color: #FFD700;
+            text-shadow: 2px 2px #000;
+            font-size: 3rem;
+            animation: slideInDown 1s;
+        }
+        @keyframes slideInDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        .card {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(255, 215, 0, 0.1));
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        .card-title {
+            color: #FFD700;
+            text-align: center;
+            font-size: 1.5rem;
+            padding-top: 15px;
+            animation: fadeIn 1s;
+        }
+        .card-body {
+            padding: 15px;
+        }
+        .server-status {
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            animation: pulse 2s infinite;
+        }
+        .online {
+            background-color: #00FF00;
+            color: #000;
+        }
+        .offline {
+            background-color: #FF0000;
+            color: #fff;
+        }
+        .server-info {
+            padding: 10px;
+            background: rgba(255, 215, 0, 0.05);
+            border-radius: 8px;
+            animation: fadeIn 1s;
+        }
+        .server-info p {
+            margin-bottom: 0.5rem;
+            color: #A9A9A9;
+        }
+        @font-face {
+            font-family: 'Minecraftia';
+            src: url('Minecraftia-Regular.ttf') format('truetype');
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container animate__animated animate__fadeIn">
+        <header class="mb-4 text-center animate__animated animate__slideInDown">
+            <h1>Minecraft Server Status</h1>
+        </header>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            <div class="col">
+                <div class="card h-100" id="server1">
+                    <div class="card-body">
+                        <h5 class="card-title">Main Server - Washington</h5>
+                        <!-- Detailed Server status will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card h-100" id="server2">
+                    <div class="card-body">
+                        <h5 class="card-title">Node Server - Singapore</h5>
+                        <!-- Detailed Server status will be dynamically inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const servers = [
+                { ip: '172.236.157.134', port: '19132', elementId: 'server1', location: 'Washington' },
+                { ip: '172.234.245.21', port: '19132', elementId: 'server2', location: 'Singapore' }
+            ];
+
+            function fetchServerStatus(server) {
+                fetch(`https://api.mcstatus.io/v2/status/bedrock/${server.ip}:${server.port}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const cardBody = document.getElementById(server.elementId).querySelector('.card-body');
+                        cardBody.innerHTML += `
+                            <p class="server-status ${data.online ? 'online' : 'offline'}">${data.online ? 'Online' : 'Offline'}</p>
+                            <div class="server-info">
+                                <p>Players: ${data.players.online}/${data.players.max}</p>
+                                <p>Version: ${data.version.name}</p>
+                                <p>Game Mode: ${data.gamemode}</p>
+                                <p>Server IP: ${server.ip}:${server.port}</p>
+                                <p>Location: ${server.location}</p>
+                            </div>
+                        `;
+                    });
+            }
+
+            servers.forEach(fetchServerStatus);
+        });
+    </script>
+</body>
+</html>
